@@ -37,7 +37,7 @@ Java_trackingsoft_tracking_FaceTracking_initTracking(JNIEnv *env, jobject obj, j
         jbyte *pBuf = (jbyte *) env->GetByteArrayElements(yuv, 0);
         cv::Mat image(height + height / 2, width, CV_8UC1, (unsigned char *) pBuf);
         cv::Mat mBgr;
-        cvtColor(image, mBgr, CV_YUV2BGR_NV21);
+        cvtColor(image, mBgr, cv::COLOR_YUV2BGR_NV21);
         cv::transpose(mBgr, mBgr);
         cv::flip(mBgr, mBgr, -1);
         FaceTracking *trackingSession = (FaceTracking *) handle;
@@ -54,7 +54,7 @@ Java_trackingsoft_tracking_FaceTracking_update(JNIEnv *env, jobject obj, jbyteAr
     jbyte *pBuf = (jbyte *) env->GetByteArrayElements(yuv, 0);
     cv::Mat image(height + height / 2, width, CV_8UC1, (unsigned char *) pBuf);
     cv::Mat mBgr;
-    cvtColor(image, mBgr, CV_YUV2BGR_NV21);
+    cvtColor(image, mBgr, cv::COLOR_YUV2BGR_NV21);
     cv::transpose(mBgr, mBgr);
     cv::flip(mBgr, mBgr, -1);
     FaceTracking *trackingSession = (FaceTracking *) handle;

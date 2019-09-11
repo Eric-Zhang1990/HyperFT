@@ -349,9 +349,9 @@ public:
         cv::resize(frame,frame_,cv::Size(),1/scale,1/scale);
         cv::resize(model,model_,cv::Size(),1/scale,1/scale);
         cv::Mat gray;
-        cvtColor(frame_, gray, CV_RGB2GRAY);
+        cvtColor(frame_, gray, cv::COLOR_RGB2GRAY);
         cv::Mat gray_model;
-        cvtColor(model_, gray_model, CV_RGB2GRAY);
+        cvtColor(model_, gray_model, cv::COLOR_RGB2GRAY);
         cv::Rect searchWindow;
         searchWindow.width = trackBox.width * 3;
         searchWindow.height = trackBox.height * 3;
@@ -359,7 +359,7 @@ public:
         searchWindow.y = trackBox.y + trackBox.height * 0.5 - searchWindow.height * 0.5;
         searchWindow &= cv::Rect(0, 0, frame_.cols, frame_.rows);
         cv::Mat similarity;
-        matchTemplate(gray(searchWindow), gray_model, similarity, CV_TM_CCOEFF_NORMED);
+        matchTemplate(gray(searchWindow), gray_model, similarity, cv::TM_CCOEFF_NORMED);
         double mag_r;
         cv::Point point;
         minMaxLoc(similarity, 0, &mag_r, 0, &point);
@@ -454,11 +454,10 @@ public:
 
         if(detection_Time < 0 )
         {
-            detection_Time = (double)cvGetTickCount();
+            detection_Time = (double)cv::getTickCount();
         }
         else{
-            double diff= (double)cvGetTickCount() - detection_Time ;
-            diff /=(cvGetTickFrequency()*1000);
+            double diff= (double)(cv::getTickCount() - detection_Time) * 1000 / cv::getTickFrequency();
             if(diff>detection_Interval )
             {
                 cv::Size lowDpSize(ImageHighDP.cols/downSimpilingFactor,ImageHighDP.rows/downSimpilingFactor);
@@ -470,7 +469,7 @@ public:
                     cv::Rect rect1 = rect.convert_cv_rect(ImageLowDP.rows,ImageLowDP.cols);
                     setMask(ImageLowDP,rect1);
                 }
-                detection_Time = (double)cvGetTickCount();
+                detection_Time = (double)cv::getTickCount();
                 // do detection in thread
                 detecting(&ImageLowDP);
             }
