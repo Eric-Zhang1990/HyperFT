@@ -5,6 +5,9 @@
 
 
 #### Related Resources
+
++ [项目所需计算库ncnn](https://github.com/Tencent/ncnn/releases/download/20190611/ncnn-android-lib.zip)
+
 + [MTCNN的另类用法](https://blog.csdn.net/relocy/article/details/84075570)
 
 
