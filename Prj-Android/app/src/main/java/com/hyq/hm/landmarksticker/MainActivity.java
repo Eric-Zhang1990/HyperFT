@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
 //                        Log.e("TAG", "faceActions length   == " + faceActions.size());
                         for (Face r : faceActions) {
-                            float[] points = new float[106 * 2];
+                            float[] points = new float[5 * 2];
                             float[] points_rect = new float[4 * 2];
 
                             Rect rect = new Rect(r.left, r.top, r.right, r.bottom);
@@ -269,49 +269,26 @@ public class MainActivity extends AppCompatActivity {
                             points_rect[7] = view2openglY(y4, CameraOverlap.PREVIEW_WIDTH);
 
 
-//                            for (int i = 0; i < 106; i++) {
-//                              int x;
-//                              if (rotate270) {
-//                                  x = r.landmarks[i * 2];
-//                              } else {
-//                                  x = CameraOverlap.PREVIEW_HEIGHT - r.landmarks[i * 2];
-//                              }
-//                              int y = r.landmarks[i * 2 + 1];
-//                              if (t > y || t == 0) {
-//                                  t = y;
-//                                  j = i;
-//                              }
-//                              points[i * 2] = view2openglX(x, CameraOverlap.PREVIEW_HEIGHT);
-//                              points[i * 2 + 1] = view2openglY(y, CameraOverlap.PREVIEW_WIDTH);
-//                              if (i == 69) {
-//                                  float[] p = new float[8];
-//                                  p[0] = view2openglX(x + 20, CameraOverlap.PREVIEW_HEIGHT);
-//                                  p[1] = view2openglY(y - 20, CameraOverlap.PREVIEW_WIDTH);
-//                                  p[2] = view2openglX(x - 20, CameraOverlap.PREVIEW_HEIGHT);
-//                                  p[3] = view2openglY(y - 20, CameraOverlap.PREVIEW_WIDTH);
-//                                  p[4] = view2openglX(x + 20, CameraOverlap.PREVIEW_HEIGHT);
-//                                  p[5] = view2openglY(y + 20, CameraOverlap.PREVIEW_WIDTH);
-//                                  p[6] = view2openglX(x - 20, CameraOverlap.PREVIEW_HEIGHT);
-//                                  p[7] = view2openglY(y + 20, CameraOverlap.PREVIEW_WIDTH);
-//                                  mBitmaps.get(bitmap).setPoints(p);
-//                                  mBitmaps.get(bitmap).drawFrame((int) (x * sw), (int) (mEglUtils.getHeight() - y * sh), rect.width(), rect.height(), r.roll, r.yaw, r.pitch, i == 69);
-//                                  bitmap++;
-//                              }
-//                         }
+                            for (int i = 0; i < 5; i++) {
+                              int x;
+                              if (rotate270) {
+                                  x = r.landmarks[i * 2];
+                              } else {
+                                  x = CameraOverlap.PREVIEW_HEIGHT - r.landmarks[i * 2];
+                              }
+                              int y = r.landmarks[i * 2 + 1];
+                              if (t > y || t == 0) {
+                                  t = y;
+                                  j = i;
+                              }
+                              points[i * 2] = view2openglX(x, CameraOverlap.PREVIEW_HEIGHT);
+                              points[i * 2 + 1] = view2openglY(y, CameraOverlap.PREVIEW_WIDTH);
+                            }
 
-//                            int[] arr1 = {50, 72, 69, 45, 105};
-  //                          for (int i = 0; i < arr1.length; i++)
-  //                            float x = points[i * 2];
- //                               float y = points[i * 2 + 1];
- //                               points[i * 2] = points[arr1[i] * 2];
- //                               points[i * 2 + 1] = points[arr1[i] * 2 + 1];
- //                               points[arr1[i] * 2] = x;
-//                                points[arr1[i] * 2 + 1] = y;
-//                           }
 
                             if (checkBox.isChecked()) {
-                                //mPoints.get(face).setPoints(points);
-                                //mPoints.get(face).drawPoints(mFrame.getRect(),r.ID);
+                                mPoints.get(face).setPoints(points);
+                                mPoints.get(face).drawPoints(mFrame.getRect(),r.ID);
                                 mPoints.get(face).setRects(points_rect);
                                 mPoints.get(face).drawRects(mFrame.getRect(),r.ID);
                             }

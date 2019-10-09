@@ -25,8 +25,6 @@ public class FaceTracking {
     public native static int getTrackingNum(long session);
     public native static int[] getTrackingLandmarkByIndex(int index,long session);
     public native static int[] getTrackingLocationByIndex(int index,long session);
-    public native static int[] getAttributeByIndex(int index,long session);
-    public native static float[] getEulerAngleByIndex(int index,long session);
     public native static int getTrackingIDByIndex(int index,long session);
 
 
@@ -54,9 +52,39 @@ public class FaceTracking {
     {
         int  diff = 0 ;
 
-        for(int i = 0 ; i < 2*2; i ++)
+        for(int i = 0 ; i < 5*2; i ++)
         {
             diff+=  abs(landmark_curr[i] - landmark_prev[i]);
+
+        }
+
+        if(  diff < 5.0*5*2)
+        {
+            Log.d("test","stablizer");
+
+            for(int j=0 ; j< 5*2; j++)
+            {
+                landmark_curr[j]  = landmark_prev[j];
+            }
+            return true;
+        }
+        else if(diff < 8.0*5*2 ){
+            for(int j=0 ; j< 5*2; j++)
+            {
+                landmark_curr[j]  =(landmark_curr[j] +landmark_prev[j])/2;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean postProcess_rect(int[] rect_prev, int[] rect_curr)
+    {
+        int  diff = 0 ;
+
+        for(int i = 0 ; i < 2*2; i ++)
+        {
+            diff+=  abs(rect_curr[i] - rect_prev[i]);
 
         }
 
@@ -66,14 +94,14 @@ public class FaceTracking {
 
             for(int j=0 ; j< 2*2; j++)
             {
-                landmark_curr[j]  = landmark_prev[j];
+                rect_curr[j]  = rect_prev[j];
             }
             return true;
         }
         else if(diff < 8.0*2*2 ){
             for(int j=0 ; j< 2*2; j++)
             {
-                landmark_curr[j]  =(landmark_curr[j] +landmark_prev[j])/2;
+                rect_curr[j]  =(rect_curr[j] + rect_prev[j])/2;
             }
             return true;
         }
@@ -93,13 +121,22 @@ public class FaceTracking {
     public void postProcess_aux(int[] landmark_prev, int[] landmark_curr)
     {
 
-        for(int i = 0 ; i < 2*2; i ++)
+        for(int i = 0 ; i < 5*2; i ++)
         {
-            landmark_curr[i]  =(landmark_curr[i]);
+            landmark_curr[i]  = landmark_curr[i];
 
         }
     }
 
+    public void postProcess_aux_rect(int[] rect_prev, int[] rect_curr)
+    {
+
+        for(int i = 0 ; i < 2*2; i ++)
+        {
+            rect_curr[i]  = rect_curr[i];
+
+        }
+    }
 
 
 
@@ -108,12 +145,14 @@ public class FaceTracking {
         update(data,height,width,session);
         int numsFace = getTrackingNum(session);
         List<Face> _faces = new ArrayList<Face>();
+
         for(int i = 0 ; i < numsFace ; i++) {
             int ID_GET = -1;
             int flag = -1;
-            int[] faceRect = getTrackingLocationByIndex( i,session);
             int id = getTrackingIDByIndex(i,session);
+            int[] faceRect = getTrackingLocationByIndex( i,session);
             int[] landmarks = getTrackingLandmarkByIndex( i,session);
+
             if(tracking_seq>0)
             {
                 ID_GET = find_id_face(faces,id);
@@ -128,11 +167,30 @@ public class FaceTracking {
                         postProcess_aux(faces.get(ID_GET).landmarks, landmarks);
                     }
                 }
+                if(ID_GET!=-1) {
+                    int[] rect_t = new int[4];
+                    rect_t[0] = faces.get(ID_GET).left;
+                    rect_t[1] = faces.get(ID_GET).top;
+                    rect_t[2] = faces.get(ID_GET).right;
+                    rect_t[3] = faces.get(ID_GET).bottom;
+                    boolean res = postProcess_rect(rect_t, faceRect);
+                    if(res)
+                        flag = -2;
+                }
+                if(ID_GET!=-1){
+                    if(faces.get(ID_GET).isStable)
+                    {
+                        int[] rect_t = new int[4];
+                        rect_t[0] = faces.get(ID_GET).left;
+                        rect_t[1] = faces.get(ID_GET).top;
+                        rect_t[2] = faces.get(ID_GET).right;
+                        rect_t[3] = faces.get(ID_GET).bottom;
+                        postProcess_aux_rect(rect_t, faceRect);
+                    }
+                }
             }
 
-            Face face = new Face(landmarks[0], landmarks[1], landmarks[2] - landmarks[0], landmarks[3] - landmarks[1], landmarks,id);
-
-            //Face face = new Face(faceRect[0], faceRect[1], faceRect[2], faceRect[3], landmarks,id);
+            Face face = new Face(faceRect[0], faceRect[1], faceRect[2], faceRect[3], landmarks,id);
             if (flag == -2)
                 face.isStable = true;
             else

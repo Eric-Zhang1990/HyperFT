@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 import android.view.WindowManager;
@@ -21,7 +22,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class FaceTrackerActivity extends Activity {
+public class FaceTrackerActivity extends FragmentActivity {
     private final static int CAMERA_REQUEST_CODE = 0x111;
 
     public void copyFilesFromAssets(Context context, String oldPath, String newPath) {
@@ -35,11 +36,11 @@ public class FaceTrackerActivity extends Activity {
                     Log.d("mkdir","can't make folder");
 
                 }
-
                 for (String fileName : fileNames) {
                     copyFilesFromAssets(context, oldPath + "/" + fileName,
                             newPath + "/" + fileName);
                 }
+
             } else {
                 // file
                 InputStream is = context.getAssets().open(oldPath);

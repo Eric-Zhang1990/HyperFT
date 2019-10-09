@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -121,12 +122,13 @@ public class FaceOverlapFragment extends CameraOverlapFragment {
 
                 Rect rect=new Rect(PREVIEW_HEIGHT - r.left,r.top,PREVIEW_HEIGHT - r.right,r.bottom);
 
-                PointF[] points = new PointF[106];
-                for(int i = 0 ; i < 106 ; i++)
+                PointF[] points = new PointF[5];
+                for(int i = 0 ; i < 5 ; i++)
                 {
                     points[i]  = new PointF(r.landmarks[i*2],r.landmarks[i*2+1]);
+
                 }
-                float[] visibles =  new float[106];
+                float[] visibles =  new float[5];
                 for (int i = 0; i < points.length; i++) {
                     visibles[i] = 1.0f;
                     if (rotate270) {
@@ -134,10 +136,8 @@ public class FaceOverlapFragment extends CameraOverlapFragment {
                     }
                 }
 
-                STUtils.drawFaceRect(canvas,rect, PREVIEW_HEIGHT,
-                        PREVIEW_WIDTH, frontCamera);
-                STUtils.drawPoints(canvas, mPaint, points,visibles, PREVIEW_HEIGHT,
-                        PREVIEW_WIDTH, frontCamera);
+                STUtils.drawFaceRect(canvas,rect, PREVIEW_HEIGHT, PREVIEW_WIDTH, frontCamera);
+                STUtils.drawPoints(canvas, mPaint, points,visibles, PREVIEW_HEIGHT,PREVIEW_WIDTH, frontCamera);
 
             }
             mOverlap.getHolder().unlockCanvasAndPost(canvas);

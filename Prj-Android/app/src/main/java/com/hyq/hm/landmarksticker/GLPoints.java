@@ -110,7 +110,7 @@ public class GLPoints {
         GLES20.glEnableVertexAttribArray(aPositionHandle);
         GLES20.glVertexAttribPointer(aPositionHandle, 2, GLES20.GL_FLOAT, false, 0, 0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 106);
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 5);
 //        (-0.8f,-0.8f,0.8f,0.8f);
         //  GLES20.glDrawArrays(GLES20.GL_LINE_LOOP, 0,4);
 //        GLES20.glre(GLES20.GL_POINTS, 0, 106);

@@ -18,13 +18,13 @@ bool cmpArea(Bbox lsh, Bbox rsh) {
 //MTCNN::MTCNN(){}
 MTCNN::MTCNN(const string &model_path) {
 
-	std::vector<std::string> param_files = {
+	vector<string> param_files = {
 		model_path+"/det1.param",
 		model_path+"/det2.param",
 		model_path+"/det3.param"
 	};
 
-	std::vector<std::string> bin_files = {
+	vector<string> bin_files = {
 		model_path+"/det1.bin",
 		model_path+"/det2.bin",
 		model_path+"/det3.bin"
@@ -38,7 +38,7 @@ MTCNN::MTCNN(const string &model_path) {
 	Onet.load_model(bin_files[2].data());
 }
 
-MTCNN::MTCNN(const std::vector<std::string> param_files, const std::vector<std::string> bin_files){
+MTCNN::MTCNN(const vector<string> param_files, const vector<string> bin_files){
     Pnet.load_param(param_files[0].data());
     Pnet.load_model(bin_files[0].data());
     Rnet.load_param(param_files[1].data());
@@ -56,7 +56,7 @@ MTCNN::~MTCNN(){
 void MTCNN::SetMinFace(int minSize){
 	minsize = minSize;
 }
-void MTCNN::generateBbox(ncnn::Mat score, ncnn::Mat location, std::vector<Bbox>& boundingBox_, float scale){
+void MTCNN::generateBbox(ncnn::Mat score, ncnn::Mat location, vector<Bbox>& boundingBox_, float scale){
     const int stride = 2;
     const int cellsize = 12;
     //score p
@@ -96,15 +96,15 @@ void MTCNN::nmsTwoBoxs(vector<Bbox>& boundingBox_, vector<Bbox>& previousBox_, c
 	float maxY = 0;
 	float minX = 0;
 	float minY = 0;
-	//std::cout << boundingBox_.size() << " ";
-	for (std::vector<Bbox>::iterator ity = previousBox_.begin(); ity != previousBox_.end(); ity++) {
-		for (std::vector<Bbox>::iterator itx = boundingBox_.begin(); itx != boundingBox_.end();) {
+	//cout << boundingBox_.size() << " ";
+	for (vector<Bbox>::iterator ity = previousBox_.begin(); ity != previousBox_.end(); ity++) {
+		for (vector<Bbox>::iterator itx = boundingBox_.begin(); itx != boundingBox_.end();) {
 			int i = itx - boundingBox_.begin();
 			int j = ity - previousBox_.begin();
-			maxX = std::max(boundingBox_.at(i).x1, previousBox_.at(j).x1);
-			maxY = std::max(boundingBox_.at(i).y1, previousBox_.at(j).y1);
-			minX = std::min(boundingBox_.at(i).x2, previousBox_.at(j).x2);
-			minY = std::min(boundingBox_.at(i).y2, previousBox_.at(j).y2);
+			maxX = max(boundingBox_.at(i).x1, previousBox_.at(j).x1);
+			maxY = max(boundingBox_.at(i).y1, previousBox_.at(j).y1);
+			minX = min(boundingBox_.at(i).x2, previousBox_.at(j).x2);
+			minY = min(boundingBox_.at(i).y2, previousBox_.at(j).y2);
 			//maxX1 and maxY1 reuse
 			maxX = ((minX - maxX + 1)>0) ? (minX - maxX + 1) : 0;
 			maxY = ((minY - maxY + 1)>0) ? (minY - maxY + 1) : 0;
@@ -124,10 +124,10 @@ void MTCNN::nmsTwoBoxs(vector<Bbox>& boundingBox_, vector<Bbox>& previousBox_, c
 			}
 		}
 	}
-	//std::cout << boundingBox_.size() << std::endl;
+	//cout << boundingBox_.size() << endl;
 }
 
-void MTCNN::nms(std::vector<Bbox> &boundingBox_, const float overlap_threshold, string modelname){
+void MTCNN::nms(vector<Bbox> &boundingBox_, const float overlap_threshold, string modelname){
     if(boundingBox_.empty()){
         return;
     }
@@ -137,24 +137,24 @@ void MTCNN::nms(std::vector<Bbox> &boundingBox_, const float overlap_threshold, 
     float maxY = 0;
     float minX = 0;
     float minY = 0;
-    std::vector<int> vPick;
+    vector<int> vPick;
     int nPick = 0;
-    std::multimap<float, int> vScores;
+    multimap<float, int> vScores;
     const int num_boxes = boundingBox_.size();
 	vPick.resize(num_boxes);
 	for (int i = 0; i < num_boxes; ++i){
-		vScores.insert(std::pair<float, int>(boundingBox_[i].score, i));
+		vScores.insert(pair<float, int>(boundingBox_[i].score, i));
 	}
     while(vScores.size() > 0){
         int last = vScores.rbegin()->second;
         vPick[nPick] = last;
         nPick += 1;
-        for (std::multimap<float, int>::iterator it = vScores.begin(); it != vScores.end();){
+        for (multimap<float, int>::iterator it = vScores.begin(); it != vScores.end();){
             int it_idx = it->second;
-            maxX = std::max(boundingBox_.at(it_idx).x1, boundingBox_.at(last).x1);
-            maxY = std::max(boundingBox_.at(it_idx).y1, boundingBox_.at(last).y1);
-            minX = std::min(boundingBox_.at(it_idx).x2, boundingBox_.at(last).x2);
-            minY = std::min(boundingBox_.at(it_idx).y2, boundingBox_.at(last).y2);
+            maxX = max(boundingBox_.at(it_idx).x1, boundingBox_.at(last).x1);
+            maxY = max(boundingBox_.at(it_idx).y1, boundingBox_.at(last).y1);
+            minX = min(boundingBox_.at(it_idx).x2, boundingBox_.at(last).x2);
+            minY = min(boundingBox_.at(it_idx).y2, boundingBox_.at(last).y2);
             //maxX1 and maxY1 reuse 
             maxX = ((minX-maxX+1)>0)? (minX-maxX+1) : 0;
             maxY = ((minY-maxY+1)>0)? (minY-maxY+1) : 0;
@@ -174,7 +174,7 @@ void MTCNN::nms(std::vector<Bbox> &boundingBox_, const float overlap_threshold, 
     }
     
     vPick.resize(nPick);
-    std::vector<Bbox> tmp_;
+    vector<Bbox> tmp_;
     tmp_.resize(nPick);
     for(int i = 0; i < nPick; i++){
         tmp_[i] = boundingBox_[vPick[i]];
@@ -227,7 +227,7 @@ void MTCNN::extractMaxFace(vector<Bbox>& boundingBox_)
 		return;
 	}
 	sort(boundingBox_.begin(), boundingBox_.end(), cmpArea);
-	for (std::vector<Bbox>::iterator itx = boundingBox_.begin() + 1; itx != boundingBox_.end();) {
+	for (vector<Bbox>::iterator itx = boundingBox_.begin() + 1; itx != boundingBox_.end();) {
 		itx = boundingBox_.erase(itx);
 	}
 }
@@ -246,7 +246,7 @@ void MTCNN::PNet(float scale)
 	ncnn::Mat score_, location_;
 	ex.extract("prob1", score_);
 	ex.extract("conv4-2", location_);
-	std::vector<Bbox> boundingBox_;
+	vector<Bbox> boundingBox_;
 
 	generateBbox(score_, location_, boundingBox_, scale);
 	nms(boundingBox_, nms_threshold[0]);
@@ -279,7 +279,7 @@ void MTCNN::PNet(){
         ncnn::Mat score_, location_;
         ex.extract("prob1", score_);
         ex.extract("conv4-2", location_);
-        std::vector<Bbox> boundingBox_;
+        vector<Bbox> boundingBox_;
         generateBbox(score_, location_, boundingBox_, scales_[i]);
         nms(boundingBox_, nms_threshold[0]);
         firstBbox_.insert(firstBbox_.end(), boundingBox_.begin(), boundingBox_.end());
@@ -311,6 +311,22 @@ void MTCNN::RNet(){
 		}
     }
 }
+
+
+float MTCNN::rnet(ncnn::Mat& img) {
+
+	ncnn::Extractor ex = Rnet.create_extractor();
+	const float mean_vals[3] = { 127.5f, 127.5f, 127.5f };
+	const float norm_vals[3] = { 1.0 / 127.5, 1.0 / 127.5, 1.0 / 127.5 };
+	img.substract_mean_normalize(mean_vals, norm_vals);
+	ex.set_light_mode(true);
+	ex.input("data", img);
+	ncnn::Mat score;
+	ex.extract("prob1", score);
+	return (float)score[1];
+}
+
+
 void MTCNN::ONet(){
     thirdBbox_.clear();
     for(vector<Bbox>::iterator it=secondBbox_.begin(); it!=secondBbox_.end();it++){
@@ -341,7 +357,37 @@ void MTCNN::ONet(){
 		}
     }
 }
-void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
+
+Bbox MTCNN::onet(ncnn::Mat& img, int x, int y, int w, int h) {
+
+	Bbox faceBbox;
+	const float mean_vals[3] = { 127.5f, 127.5f, 127.5f };
+	const float norm_vals[3] = { 1.0 / 127.5, 1.0 / 127.5, 1.0 / 127.5 };
+	img.substract_mean_normalize(mean_vals, norm_vals);
+	ncnn::Extractor ex = Onet.create_extractor();
+
+	ex.set_light_mode(true);
+	ex.input("data", img);
+	ncnn::Mat score, bbox, keyPoint;
+	ex.extract("prob1", score);
+	ex.extract("conv6-2", bbox);
+	ex.extract("conv6-3", keyPoint);
+	faceBbox.score = score.channel(1)[0];
+	faceBbox.x1 = static_cast<int>(bbox[0] * w) + x;
+	faceBbox.y1 = static_cast<int>(bbox[1] * h) + y;
+	faceBbox.x2 = static_cast<int>(bbox[2] * w) + h + x;
+	faceBbox.y2 = static_cast<int>(bbox[3] * h) + h + y;
+	for (int num = 0; num<5; num++) {
+		(faceBbox.ppoint)[num] = x + w * keyPoint[num];
+		(faceBbox.ppoint)[num + 5] = y + h * keyPoint[num + 5];
+	}
+
+	return faceBbox;
+	
+}
+
+
+void MTCNN::detect(ncnn::Mat& img_, vector<Bbox>& finalBbox_){
     img = img_;
     img_w = img.w;
     img_h = img.h;
@@ -369,10 +415,12 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
     refine(thirdBbox_, img_h, img_w, true);
     nms(thirdBbox_, nms_threshold[2], "Min");
     finalBbox_ = thirdBbox_;
+	if (smooth)
+		SmoothBbox(finalBbox_);
 }
 
 
-void MTCNN::detectMaxFace(ncnn::Mat& img_, std::vector<Bbox>& finalBbox) {
+void MTCNN::detectMaxFace(ncnn::Mat& img_, vector<Bbox>& finalBbox) {
 	firstPreviousBbox_.clear();
 	secondPreviousBbox_.clear();
 	thirdPrevioussBbox_.clear();
@@ -442,16 +490,68 @@ void MTCNN::detectMaxFace(ncnn::Mat& img_, std::vector<Bbox>& finalBbox) {
 		if (thirdBbox_.size() > 0) {
 			extractMaxFace(thirdBbox_);
 			finalBbox = thirdBbox_;//if largest face size is similar,.
+			if (smooth)
+				SmoothBbox(finalBbox);
 			break;
 		}
 	}
 
 }
 
+float MTCNN::iou(Bbox & b1, Bbox & b2, string modelname)
+{
+	float IOU = 0;
+	float maxX = 0;
+	float maxY = 0;
+	float minX = 0;
+	float minY = 0;
+	maxX = max(b1.x1, b2.x1);
+	maxY = max(b1.y1, b2.y1);
+	minX = min(b1.x2, b2.x2);
+	minY = min(b1.y2, b2.y2);
+	//maxX1 and maxY1 reuse
+	maxX = ((minX - maxX + 1)>0) ? (minX - maxX + 1) : 0;
+	maxY = ((minY - maxY + 1)>0) ? (minY - maxY + 1) : 0;
+	IOU = maxX * maxY;
 
-//void MTCNN::detection(const cv::Mat& img, std::vector<cv::Rect>& rectangles){
+	if (!modelname.compare("Union"))
+		IOU = IOU / (b1.area + b2.area - IOU);
+	else if (!modelname.compare("Min")) {
+		IOU = IOU / ((b1.area < b2.area) ? b1.area : b2.area);
+	}
+	return IOU;
+}
+
+void MTCNN::SmoothBbox(std::vector<Bbox>& finalBbox)
+{
+	static std::vector<Bbox> preBbox_;
+	for (int i = 0; i < finalBbox.size(); i++) {
+		for (int j = 0; j < preBbox_.size(); j++) {
+			if (iou(finalBbox[i], preBbox_[j]) > 0.90)
+			{
+				finalBbox[i] = preBbox_[j];
+			}
+			else if (iou(finalBbox[i], preBbox_[j]) > 0.6) {
+				finalBbox[i].x1 = (finalBbox[i].x1 + preBbox_[j].x1) / 2;
+				finalBbox[i].y1 = (finalBbox[i].y1 + preBbox_[j].y1) / 2;
+				finalBbox[i].x2 = (finalBbox[i].x2 + preBbox_[j].x2) / 2;
+				finalBbox[i].y2 = (finalBbox[i].y2 + preBbox_[j].y2) / 2;
+				//finalBbox[i].area = (finalBbox[i].x2 - finalBbox[i].x1)*(finalBbox[i].y2 - finalBbox[i].y1);
+				for (int k = 0; k < 10; k++)
+				{
+					finalBbox[i].ppoint[k] = (finalBbox[i].ppoint[k] + preBbox_[j].ppoint[k]) / 2;
+				}
+			}
+		}
+	}
+	preBbox_ = finalBbox;
+
+}
+
+
+//void MTCNN::detection(const cv::Mat& img, vector<cv::Rect>& rectangles){
 //    ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(img.data, ncnn::Mat::PIXEL_BGR2RGB, img.cols, img.rows);
-//    std::vector<Bbox> finalBbox;
+//    vector<Bbox> finalBbox;
 //    detect(ncnn_img, finalBbox);
 //    const int num_box = finalBbox.size();
 //    rectangles.resize(num_box);

@@ -49,7 +49,7 @@ Java_trackingsoft_tracking_FaceTracking_initTracking(JNIEnv *env, jobject obj, j
 
 JNIEXPORT void JNICALL
 Java_trackingsoft_tracking_FaceTracking_update(JNIEnv *env, jobject obj, jbyteArray yuv,
-                                                jint height, jint width, jlong handle,jint isFlip) {
+                                                jint height, jint width, jlong handle) {
 
     jbyte *pBuf = (jbyte *) env->GetByteArrayElements(yuv, 0);
     cv::Mat image(height + height / 2, width, CV_8UC1, (unsigned char *) pBuf);
@@ -76,13 +76,12 @@ Java_trackingsoft_tracking_FaceTracking_getTrackingNum(JNIEnv *env, jobject obj,
 JNIEXPORT jintArray JNICALL
 Java_trackingsoft_tracking_FaceTracking_getTrackingLandmarkByIndex(JNIEnv *env, jobject obj,jint target, jlong handle) {
     FaceTracking *trackingSession = (FaceTracking *) handle;
-    jintArray jarr = env->NewIntArray(106*2);
+    jintArray jarr = env->NewIntArray(5*2);
     jint *arr = env->GetIntArrayElements(jarr, NULL);
     const Face &info= trackingSession->trackingFace[target];
-    int i = 0;
-    for(; i < 106; i++){
-        arr[i*2+0] = (*info.landmark)[i].x;
-        arr[i*2+1] = (*info.landmark)[i].y;
+    for(int i = 0; i < 5; i++){
+        arr[i*2+0] = info.faceBbox.ppoint[i];
+        arr[i*2+1] = info.faceBbox.ppoint[i + 5];
     }
 
     env->ReleaseIntArrayElements(jarr, arr, 0);
@@ -97,49 +96,16 @@ Java_trackingsoft_tracking_FaceTracking_getTrackingLocationByIndex(JNIEnv *env, 
     jint *arr = env->GetIntArrayElements(jarr, NULL);
     const Face &info= trackingSession->trackingFace[target];
 
-    cv::Rect rect = cv::boundingRect(*info.landmark);
-    Shape::Rect<float> frect = info.face_location;
-
-
-    arr[0] = (*info.landmark)[0].x;
-    arr[1] = (*info.landmark)[0].y;
-    arr[2] = (*info.landmark)[1].x-(*info.landmark)[0].x;
-    arr[3] = (*info.landmark)[1].y-(*info.landmark)[0].y;;
+    arr[0] = info.faceBbox.x1;
+    arr[1] = info.faceBbox.y1;
+    //arr[2] = info.faceBbox.x2;
+    //arr[3] = info.faceBbox.y2;
+    arr[2] = info.faceBbox.x2 - info.faceBbox.x1;
+    arr[3] = info.faceBbox.y2 - info.faceBbox.y1;
 
     __android_log_print(ANDROID_LOG_DEBUG,"pos","height %d width %d",trackingSession->UI_height,trackingSession->UI_width);
     __android_log_print(ANDROID_LOG_DEBUG,"pos","x:%d . y:%d , w:%d ,h:%d",arr[0],arr[1],arr[2],arr[3]);
     env->ReleaseIntArrayElements(jarr, arr, 0);
-    return jarr;
-}
-
-
-JNIEXPORT jintArray JNICALL
-Java_trackingsoft_tracking_FaceTracking_getAttributeByIndex(JNIEnv *env, jobject obj,jint target, jlong handle) {
-
-    FaceTracking *trackingSession = (FaceTracking *) handle;
-    jintArray jarr = env->NewIntArray(4);
-    jint *arr = env->GetIntArrayElements(jarr, NULL);
-    const Face &info= trackingSession->trackingFace[target];
-    arr[0] = info.stateMonth;
-    arr[1] = info.stateEye;
-    arr[2] = info.stateShake;
-    arr[3] = info.stateRise;
-    env->ReleaseIntArrayElements(jarr, arr, 0);
-    return jarr;
-}
-
-
-JNIEXPORT jfloatArray JNICALL
-Java_trackingsoft_tracking_FaceTracking_getEulerAngleByIndex(JNIEnv *env, jobject obj,jint target, jlong handle) {
-
-    FaceTracking *trackingSession = (FaceTracking *) handle;
-    jfloatArray jarr = env->NewFloatArray(3);
-    jfloat *arr = env->GetFloatArrayElements(jarr, NULL);
-    const Face &info= trackingSession->trackingFace[target];
-    arr[0] = info.eulerAngle[0];
-    arr[1] = info.eulerAngle[1];
-    arr[2] = info.eulerAngle[2];
-    env->ReleaseFloatArrayElements(jarr, arr, 0);
     return jarr;
 }
 

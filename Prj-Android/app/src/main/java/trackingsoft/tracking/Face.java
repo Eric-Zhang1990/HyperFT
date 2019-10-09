@@ -16,6 +16,9 @@ public class Face {
     public int bottom;
     public int height;
     public int width;
+    public int roll;
+    public int yaw;
+    public int pitch;
     public int[] landmarks;
     public boolean isStable;
 
@@ -34,8 +37,8 @@ public class Face {
         bottom = y2;
         height = y2-y1;
         width  = x2-x1;
-        landmarks = new int[106*2];
-
+        landmarks = new int[5*2];
+        roll = yaw = pitch = 0;
     }
 
 
@@ -48,7 +51,8 @@ public class Face {
         width = _width;
         height  = _height;
         ID = id;
-
+        landmarks = new int[5*2];
+        roll = yaw = pitch = 0;
     }
 
 
@@ -59,9 +63,12 @@ public class Face {
         bottom = y1 + _height;
         width = _width;
         height  = _height;
-        landmarks = landmark;
+        landmarks = new int[5*2];
+        for(int i=0;i<10;i++) {
+            landmarks[i] = landmark[i];
+        }
         ID = id;
-
+        roll = yaw = pitch = 0;
     }
 
 
